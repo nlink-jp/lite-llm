@@ -1,0 +1,5 @@
+#!/bin/sh
+# pre-commit: fast quality gate (vet + lint only)
+set -e
+echo "--- pre-commit: vet + lint ---"
+make vet lint

@@ -1,0 +1,21 @@
+# Compiled binaries
+bin/
+
+# Release archives
+dist/
+
+# Project-local Go module cache (sandbox workaround)
+.go/
+
+# macOS
+.DS_Store
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+config.toml
+
+# External source
+external/

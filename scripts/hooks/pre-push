@@ -1,0 +1,5 @@
+#!/bin/sh
+# pre-push: full quality gate (vet + lint + test + build + security scan)
+set -e
+echo "--- pre-push: full check ---"
+make check
