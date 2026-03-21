@@ -116,6 +116,16 @@ This allows both bare base URLs (`https://api.openai.com`) and versioned URLs
 (`http://localhost:1234/v1`, common in LM Studio and similar local servers) to work
 without manual path adjustment.
 
+## Quiet Mode (`--quiet` / `-q`)
+
+Pass `--quiet` (or `-q`) to suppress all warnings written to stderr:
+
+- `response_format` fallback warning (when auto-retry with prompt injection occurs)
+- Config file permission warning (when the file is not 0600)
+
+Warnings are routed through `cmd.ErrOrStderr()` so they can be captured or discarded
+cleanly both in normal use and in tests.
+
 ## Quality Gates
 
 - **pre-commit hook**: `make vet lint`

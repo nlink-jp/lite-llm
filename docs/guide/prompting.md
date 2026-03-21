@@ -117,6 +117,25 @@ If one line fails (e.g. network error, rate limit), the error is written to stde
 and processing continues with the next line. When using `--format jsonl` the error is
 captured in the `error` field of the output record instead.
 
+## Suppressing warnings (`--quiet` / `-q`)
+
+lite-llm may write informational warnings to stderr in certain situations:
+
+- **`response_format` fallback**: when `--format json` is used with a local LLM that
+  does not support `response_format`, a warning is printed before retrying with prompt
+  injection.
+- **Config file permissions**: if the config file is readable by group or others
+  (not 0600), a permission warning is printed.
+
+Pass `--quiet` (or `-q`) to suppress all such warnings:
+
+```sh
+lite-llm --quiet --format json --prompt "give me json"
+```
+
+This is useful in scripts or pipelines where you want clean stdout-only output without
+interleaved warnings on stderr.
+
 ## System prompt tips
 
 - Keep the system prompt focused on the task; do not include data in it.
