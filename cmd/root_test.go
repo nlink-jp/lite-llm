@@ -73,7 +73,7 @@ func TestLoadJSONSchemaFile_SchemaNameFromFilename(t *testing.T) {
 	for _, tt := range tests {
 		dir := t.TempDir()
 		path := filepath.Join(dir, tt.filename)
-		os.WriteFile(path, []byte(`{}`), 0600)
+		_ = os.WriteFile(path, []byte(`{}`), 0600)
 
 		rf, err := loadJSONSchemaFile(path)
 		if err != nil {
@@ -148,7 +148,7 @@ func mockServer(t *testing.T, responseText string) *httptest.Server {
 	}
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(resp{
+		_ = json.NewEncoder(w).Encode(resp{
 			Choices: []struct {
 				Message msg `json:"message"`
 			}{{Message: msg{Role: "assistant", Content: responseText}}},
@@ -188,7 +188,7 @@ func TestCommand_FileInput(t *testing.T) {
 
 	dir := t.TempDir()
 	path := filepath.Join(dir, "input.txt")
-	os.WriteFile(path, []byte("data from file"), 0600)
+	_ = os.WriteFile(path, []byte("data from file"), 0600)
 
 	stdout, _, err := runCmd(t, srv.URL, "--file", path, "--prompt", "summarize")
 	if err != nil {
@@ -213,7 +213,7 @@ func TestCommand_MissingModelError(t *testing.T) {
 	// Write a config that explicitly clears the model to trigger the validation error.
 	dir := t.TempDir()
 	cfgPath := filepath.Join(dir, "config.toml")
-	os.WriteFile(cfgPath, []byte(`model = ""`), 0600)
+	_ = os.WriteFile(cfgPath, []byte(`model = ""`), 0600)
 
 	var outBuf bytes.Buffer
 	cmd := newRootCmd()
@@ -240,7 +240,7 @@ func TestCommand_JSONFormat(t *testing.T) {
 				Type string `json:"type"`
 			} `json:"response_format"`
 		}
-		json.NewDecoder(r.Body).Decode(&req)
+		_ = json.NewDecoder(r.Body).Decode(&req)
 
 		type msg struct {
 			Role    string `json:"role"`
@@ -252,7 +252,7 @@ func TestCommand_JSONFormat(t *testing.T) {
 			} `json:"choices"`
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(resp{
+		_ = json.NewEncoder(w).Encode(resp{
 			Choices: []struct {
 				Message msg `json:"message"`
 			}{{Message: msg{Role: "assistant", Content: `{"key":"value"}`}}},
@@ -281,10 +281,10 @@ func TestCommand_JSONSchemaFile(t *testing.T) {
 				} `json:"json_schema"`
 			} `json:"response_format"`
 		}
-		json.NewDecoder(r.Body).Decode(&req)
+		_ = json.NewDecoder(r.Body).Decode(&req)
 		if req.ResponseFormat == nil || req.ResponseFormat.Type != "json_schema" {
 			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprint(w, `{"error":{"message":"expected json_schema"}}`)
+			_, _ = fmt.Fprint(w, `{"error":{"message":"expected json_schema"}}`)
 			return
 		}
 
@@ -293,7 +293,7 @@ func TestCommand_JSONSchemaFile(t *testing.T) {
 			Choices []struct{ Message msg `json:"message"` } `json:"choices"`
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(resp{Choices: []struct {
+		_ = json.NewEncoder(w).Encode(resp{Choices: []struct {
 			Message msg `json:"message"`
 		}{{Message: msg{Role: "assistant", Content: `{"name":"Alice"}`}}}})
 	}))
@@ -301,7 +301,7 @@ func TestCommand_JSONSchemaFile(t *testing.T) {
 
 	dir := t.TempDir()
 	schemaPath := filepath.Join(dir, "person.json")
-	os.WriteFile(schemaPath, []byte(`{"type":"object","properties":{"name":{"type":"string"}}}`), 0600)
+	_ = os.WriteFile(schemaPath, []byte(`{"type":"object","properties":{"name":{"type":"string"}}}`), 0600)
 
 	stdout, _, err := runCmd(t, srv.URL, "--json-schema", schemaPath, "--prompt", "generate")
 	if err != nil {
@@ -323,7 +323,7 @@ func TestCommand_BatchJSONL(t *testing.T) {
 			Choices []struct{ Message msg `json:"message"` } `json:"choices"`
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(respBody{Choices: []struct {
+		_ = json.NewEncoder(w).Encode(respBody{Choices: []struct {
 			Message msg `json:"message"`
 		}{{Message: msg{Role: "assistant", Content: resp}}}})
 	}))
@@ -332,7 +332,7 @@ func TestCommand_BatchJSONL(t *testing.T) {
 	// Write batch input to a temp file.
 	dir := t.TempDir()
 	inputPath := filepath.Join(dir, "input.txt")
-	os.WriteFile(inputPath, []byte("great\nbad\nokay\n"), 0600)
+	_ = os.WriteFile(inputPath, []byte("great\nbad\nokay\n"), 0600)
 
 	stdout, _, err := runCmd(t, srv.URL,
 		"--batch", "--format", "jsonl",

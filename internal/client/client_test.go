@@ -77,7 +77,7 @@ func TestChat_WithSystemPrompt(t *testing.T) {
 		resp := chatResponse{Choices: []struct {
 			Message message `json:"message"`
 		}{{Message: message{Role: "assistant", Content: "ok"}}}}
-		json.NewEncoder(w).Encode(resp)
+		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer srv.Close()
 
@@ -95,7 +95,7 @@ func TestChat_ResponseFormatJSONObject(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, _ := io.ReadAll(r.Body)
 		var req chatRequest
-		json.Unmarshal(body, &req)
+		_ = json.Unmarshal(body, &req)
 		if req.ResponseFormat == nil {
 			t.Error("expected response_format, got nil")
 		} else if req.ResponseFormat.Type != "json_object" {
@@ -104,7 +104,7 @@ func TestChat_ResponseFormatJSONObject(t *testing.T) {
 		resp := chatResponse{Choices: []struct {
 			Message message `json:"message"`
 		}{{Message: message{Role: "assistant", Content: `{"key":"val"}`}}}}
-		json.NewEncoder(w).Encode(resp)
+		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer srv.Close()
 
@@ -123,7 +123,7 @@ func TestChat_ResponseFormatJSONSchema(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, _ := io.ReadAll(r.Body)
 		var req chatRequest
-		json.Unmarshal(body, &req)
+		_ = json.Unmarshal(body, &req)
 		if req.ResponseFormat == nil {
 			t.Fatal("expected response_format, got nil")
 		}
@@ -142,7 +142,7 @@ func TestChat_ResponseFormatJSONSchema(t *testing.T) {
 		resp := chatResponse{Choices: []struct {
 			Message message `json:"message"`
 		}{{Message: message{Role: "assistant", Content: `{"name":"test"}`}}}}
-		json.NewEncoder(w).Encode(resp)
+		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer srv.Close()
 
@@ -163,7 +163,7 @@ func TestChat_ResponseFormatJSONSchema(t *testing.T) {
 func TestChat_APIError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
-		fmt.Fprint(w, `{"error":{"message":"invalid api key"}}`)
+		_, _ = fmt.Fprint(w, `{"error":{"message":"invalid api key"}}`)
 	}))
 	defer srv.Close()
 
@@ -180,12 +180,12 @@ func TestChat_AutoFallback(t *testing.T) {
 		callCount++
 		body, _ := io.ReadAll(r.Body)
 		var req chatRequest
-		json.Unmarshal(body, &req)
+		_ = json.Unmarshal(body, &req)
 
 		if callCount == 1 {
 			// First call: reject response_format
 			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprint(w, `{"error":{"message":"response_format not supported"}}`)
+			_, _ = fmt.Fprint(w, `{"error":{"message":"response_format not supported"}}`)
 			return
 		}
 		// Second call (fallback): should have no response_format, JSON note in system prompt
@@ -204,7 +204,7 @@ func TestChat_AutoFallback(t *testing.T) {
 		resp := chatResponse{Choices: []struct {
 			Message message `json:"message"`
 		}{{Message: message{Role: "assistant", Content: `{"ok":true}`}}}}
-		json.NewEncoder(w).Encode(resp)
+		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer srv.Close()
 
@@ -242,14 +242,14 @@ func TestChat_PromptStrategy_NeverSendsResponseFormat(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, _ := io.ReadAll(r.Body)
 		var req chatRequest
-		json.Unmarshal(body, &req)
+		_ = json.Unmarshal(body, &req)
 		if req.ResponseFormat != nil {
 			t.Error("prompt strategy should not send response_format")
 		}
 		resp := chatResponse{Choices: []struct {
 			Message message `json:"message"`
 		}{{Message: message{Role: "assistant", Content: "{}"}}}}
-		json.NewEncoder(w).Encode(resp)
+		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer srv.Close()
 
@@ -282,9 +282,9 @@ func TestChatStream_Basic(t *testing.T) {
 				Content string `json:"content"`
 			}{Content: c}}}}
 			data, _ := json.Marshal(chunk)
-			fmt.Fprintf(w, "data: %s\n\n", data)
+			_, _ = fmt.Fprintf(w, "data: %s\n\n", data)
 		}
-		fmt.Fprint(w, "data: [DONE]\n\n")
+		_, _ = fmt.Fprint(w, "data: [DONE]\n\n")
 	}))
 	defer srv.Close()
 

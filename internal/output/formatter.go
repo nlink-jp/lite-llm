@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"regexp"
+	"strings"
 )
 
 // Mode controls the output format.
@@ -103,23 +105,71 @@ func (f *Formatter) WriteJSONL(input, output, errMsg string) error {
 }
 
 // writeJSON tries to pretty-print the response as a JSON object/array.
-// If the response is not valid JSON it falls back to encoding it as a JSON string.
+// Extraction is attempted in order:
+//  1. The full response is valid JSON — re-indent and write directly.
+//  2. A ```json ... ``` code fence is present — extract its content.
+//  3. Scan for the first '{' or '[' and try to parse from that position.
+//     This handles models that emit preamble, control tokens, or <think>/
+//     <reasoning> tags before the JSON payload.
+//
+// If no valid JSON is found, the full response is encoded as a JSON string.
 func (f *Formatter) writeJSON(response string) error {
-	var raw json.RawMessage
-	if err := json.Unmarshal([]byte(response), &raw); err == nil {
-		// Valid JSON: re-indent and write.
-		pretty, err := json.MarshalIndent(raw, "", "  ")
-		if err != nil {
-			return fmt.Errorf("error formatting JSON: %w", err)
-		}
-		_, err = fmt.Fprintln(f.w, string(pretty))
+	if pretty, ok := prettyJSON(response); ok {
+		_, err := fmt.Fprintln(f.w, pretty)
 		return err
 	}
-	// Not valid JSON: encode as a JSON string.
+	// Strip <think>...</think> or <reasoning>...</reasoning> blocks, then retry.
+	stripped := reThinkTag.ReplaceAllString(response, "")
+	stripped = strings.TrimSpace(stripped)
+	if pretty, ok := prettyJSON(stripped); ok {
+		_, err := fmt.Fprintln(f.w, pretty)
+		return err
+	}
+	// Extract from ```json ... ``` code fence.
+	if m := reCodeFence.FindStringSubmatch(stripped); m != nil {
+		if pretty, ok := prettyJSON(strings.TrimSpace(m[1])); ok {
+			_, err := fmt.Fprintln(f.w, pretty)
+			return err
+		}
+	}
+	// Scan for first '{' or '[' in the stripped text.
+	for i, ch := range stripped {
+		if ch == '{' || ch == '[' {
+			if pretty, ok := prettyJSON(stripped[i:]); ok {
+				_, err := fmt.Fprintln(f.w, pretty)
+				return err
+			}
+			break
+		}
+	}
+	// No valid JSON found: encode the full original response as a JSON string.
 	b, err := json.Marshal(response)
 	if err != nil {
 		return fmt.Errorf("error encoding response as JSON string: %w", err)
 	}
 	_, err = fmt.Fprintln(f.w, string(b))
 	return err
+}
+
+// reThinkTag matches thinking/reasoning blocks that models emit before the JSON payload.
+// Supported formats:
+//   - <think>...</think>, <reasoning>...</reasoning>  (DeepSeek, Qwen, etc.)
+//   - [THINK]...[/THINK]                              (Mistral: Magistral, Ministral-3, Devstral)
+var reThinkTag = regexp.MustCompile(`(?is)(?:<(think|reasoning)>.*?</(think|reasoning)>|\[THINK\].*?\[/THINK\])`)
+
+// reCodeFence matches a ```json ... ``` or ``` ... ``` code fence.
+var reCodeFence = regexp.MustCompile("(?s)```(?:json)?\\s*\n?(.*?)\\s*```")
+
+// prettyJSON re-indents s if it is valid JSON, returning the result and true.
+// Returns ("", false) if s is not valid JSON.
+func prettyJSON(s string) (string, bool) {
+	var raw json.RawMessage
+	if err := json.Unmarshal([]byte(s), &raw); err != nil {
+		return "", false
+	}
+	pretty, err := json.MarshalIndent(raw, "", "  ")
+	if err != nil {
+		return "", false
+	}
+	return string(pretty), true
 }

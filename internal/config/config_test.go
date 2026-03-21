@@ -206,7 +206,7 @@ func TestCheckPermissions_Modes(t *testing.T) {
 	for _, tt := range tests {
 		dir := t.TempDir()
 		path := filepath.Join(dir, "config.toml")
-		os.WriteFile(path, []byte(""), tt.perm)
+		_ = os.WriteFile(path, []byte(""), tt.perm)
 		info, _ := os.Stat(path)
 
 		var buf strings.Builder

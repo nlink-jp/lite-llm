@@ -250,7 +250,7 @@ func runBatch(
 		if err != nil {
 			return fmt.Errorf("error opening batch file: %w", err)
 		}
-		defer f.Close()
+		defer func() { _ = f.Close() }()
 		lines, err = input.ReadLines(f)
 		if err != nil {
 			return err
@@ -292,9 +292,9 @@ func runBatch(
 		if err != nil {
 			hasError = true
 			if outMode == output.ModeJSONL {
-				formatter.WriteJSONL(line, "", err.Error())
+				_ = formatter.WriteJSONL(line, "", err.Error())
 			} else {
-				fmt.Fprintf(cmd.ErrOrStderr(), "Error processing line %q: %v\n", truncate(line, 60), err)
+				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Error processing line %q: %v\n", truncate(line, 60), err)
 			}
 			continue
 		}

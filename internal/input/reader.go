@@ -80,7 +80,7 @@ func readFile(filePath string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error opening file %q: %w", filePath, err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	return readReader(f, filePath)
 }
 

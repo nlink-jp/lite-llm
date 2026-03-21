@@ -55,7 +55,7 @@ func (c *Client) Chat(ctx context.Context, opts ChatOptions) (string, error) {
 	default: // "auto"
 		resp, err := c.chatOnce(ctx, opts, true)
 		if err != nil && isResponseFormatError(err) && opts.ResponseFormat != nil {
-			fmt.Fprintf(stderr, "Warning: response_format not supported by this API, falling back to prompt injection\n")
+			_, _ = fmt.Fprintf(stderr, "Warning: response_format not supported by this API, falling back to prompt injection\n")
 			return c.chatOnce(ctx, injectFormatPrompt(opts), false)
 		}
 		return resp, err
@@ -87,7 +87,7 @@ func (c *Client) ChatStream(ctx context.Context, opts ChatOptions, responseChan 
 	if err != nil {
 		return fmt.Errorf("error sending request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
@@ -124,7 +124,7 @@ func (c *Client) chatOnce(ctx context.Context, opts ChatOptions, sendFormat bool
 	if err != nil {
 		return "", fmt.Errorf("error sending request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {

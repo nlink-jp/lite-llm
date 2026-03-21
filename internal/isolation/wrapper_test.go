@@ -129,7 +129,7 @@ func TestGenerateNonce_Length(t *testing.T) {
 func TestGenerateNonce_HexCharsOnly(t *testing.T) {
 	nonce := generateNonce()
 	for _, c := range nonce {
-		if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) {
+		if (c < '0' || c > '9') && (c < 'a' || c > 'f') {
 			t.Errorf("generateNonce() contains non-hex char %q in %q", c, nonce)
 		}
 	}

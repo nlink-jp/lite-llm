@@ -11,8 +11,6 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-const safePermissions = 0600
-
 // Stderr is the writer used for permission warnings; can be overridden in tests.
 var Stderr io.Writer = os.Stderr
 
@@ -84,7 +82,7 @@ func applyEnvOverrides(cfg *Config) {
 func checkPermissions(path string, info os.FileInfo) {
 	perm := info.Mode().Perm()
 	if perm&0077 != 0 {
-		fmt.Fprintf(Stderr,
+		_, _ = fmt.Fprintf(Stderr,
 			"Warning: config file %s has permissions %04o; expected 0600.\n"+
 				"  The file may contain an API key. Run: chmod 600 %s\n",
 			path, perm, path,

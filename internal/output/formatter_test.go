@@ -60,6 +60,82 @@ func TestWrite_JSON_ValidJSON(t *testing.T) {
 	}
 }
 
+func TestWrite_JSON_Preamble(t *testing.T) {
+	// Model outputs control tokens or preamble before the JSON payload.
+	// The formatter should extract and pretty-print the embedded JSON.
+	cases := []struct {
+		name  string
+		input string
+		want  string // expected decoded value as JSON
+	}{
+		{
+			name:  "control tokens before json",
+			input: "<|channel|>final <|constrain|>JSON<|message|>{\"answer\":\"東京\"}",
+			want:  `{"answer":"東京"}`,
+		},
+		{
+			name:  "plain preamble before json",
+			input: "Here is the result:\n{\"key\":\"value\"}",
+			want:  `{"key":"value"}`,
+		},
+		{
+			name:  "preamble before json array",
+			input: "Output: [1,2,3]",
+			want:  "[1,2,3]",
+		},
+		{
+			name:  "think tag before json",
+			input: "<think>Let me think about this.</think>\n{\"answer\":\"東京\"}",
+			want:  `{"answer":"東京"}`,
+		},
+		{
+			name:  "reasoning tag before json",
+			input: "<reasoning>Internal reasoning here.</reasoning>{\"answer\":42}",
+			want:  `{"answer":42}`,
+		},
+		{
+			// Mistral models (Magistral, Ministral-3, Devstral) use [THINK]...[/THINK]
+			name:  "Mistral [THINK] tag before json",
+			input: "[THINK]\nLet me think about this carefully.\n[/THINK]\n{\"answer\":\"東京\"}",
+			want:  `{"answer":"東京"}`,
+		},
+		{
+			name:  "json code fence",
+			input: "```json\n{\"answer\":\"東京\"}\n```",
+			want:  `{"answer":"東京"}`,
+		},
+		{
+			name:  "code fence without language tag",
+			input: "Here:\n```\n{\"x\":1}\n```",
+			want:  `{"x":1}`,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			var buf strings.Builder
+			f := New(&buf, ModeJSON)
+			if err := f.Write(tc.input); err != nil {
+				t.Fatalf("Write() error: %v", err)
+			}
+			output := strings.TrimSpace(buf.String())
+			// Re-encode want for comparison (normalise whitespace).
+			var wantRaw, gotRaw interface{}
+			if err := json.Unmarshal([]byte(tc.want), &wantRaw); err != nil {
+				t.Fatalf("want is not valid JSON: %v", err)
+			}
+			if err := json.Unmarshal([]byte(output), &gotRaw); err != nil {
+				t.Errorf("output is not valid JSON: %v\noutput: %q", err, output)
+				return
+			}
+			wantB, _ := json.Marshal(wantRaw)
+			gotB, _ := json.Marshal(gotRaw)
+			if string(wantB) != string(gotB) {
+				t.Errorf("decoded JSON mismatch\ngot:  %s\nwant: %s", gotB, wantB)
+			}
+		})
+	}
+}
+
 func TestWrite_JSON_PlainText(t *testing.T) {
 	var buf strings.Builder
 	f := New(&buf, ModeJSON)
@@ -142,9 +218,9 @@ func TestWriteJSONL_WithError(t *testing.T) {
 func TestWriteJSONL_MultipleLines(t *testing.T) {
 	var buf strings.Builder
 	f := New(&buf, ModeJSONL)
-	f.WriteJSONL("a", "resp a", "")
-	f.WriteJSONL("b", "", "err b")
-	f.WriteJSONL("c", "resp c", "")
+	_ = f.WriteJSONL("a", "resp a", "")
+	_ = f.WriteJSONL("b", "", "err b")
+	_ = f.WriteJSONL("c", "resp c", "")
 
 	lines := strings.Split(strings.TrimSpace(buf.String()), "\n")
 	if len(lines) != 3 {
@@ -161,10 +237,10 @@ func TestWriteJSONL_MultipleLines(t *testing.T) {
 func TestWriteText_Streaming(t *testing.T) {
 	var buf strings.Builder
 	f := New(&buf, ModeText)
-	f.WriteText("hello")
-	f.WriteText(" ")
-	f.WriteText("world")
-	f.Newline()
+	_ = f.WriteText("hello")
+	_ = f.WriteText(" ")
+	_ = f.WriteText("world")
+	_ = f.Newline()
 	if buf.String() != "hello world\n" {
 		t.Errorf("got %q, want %q", buf.String(), "hello world\n")
 	}

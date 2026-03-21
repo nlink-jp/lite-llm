@@ -49,7 +49,7 @@ func TestReadUserInput_FileMissing(t *testing.T) {
 func TestReadUserInput_DirectTakesPriorityOverFile(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "input.txt")
-	os.WriteFile(path, []byte("file content"), 0600)
+	_ = os.WriteFile(path, []byte("file content"), 0600)
 
 	result, err := ReadUserInput("direct value", path)
 	if err != nil {
@@ -76,7 +76,7 @@ func TestReadSystemPrompt_Direct(t *testing.T) {
 func TestReadSystemPrompt_File(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "sys.txt")
-	os.WriteFile(path, []byte("system instructions"), 0600)
+	_ = os.WriteFile(path, []byte("system instructions"), 0600)
 
 	got, err := ReadSystemPrompt("", path)
 	if err != nil {
