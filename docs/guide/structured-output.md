@@ -97,7 +97,7 @@ lite-llm \
   --file reviews.txt
 ```
 
-Note: `--format jsonl` is automatically implied when `--batch` is used. Each batch
+Note: `--format jsonl` must be specified explicitly alongside `--batch`. Each batch
 result is a JSONL record where `output` contains the model's JSON response as a string.
 
 ## Fallback strategy (`response_format_strategy`)
@@ -142,6 +142,20 @@ response_format_strategy = "prompt"
 - Schema compliance is best-effort; complex schemas may not be followed precisely.
 - `--json-schema` still works but schema enforcement relies entirely on the model's
   instruction-following capability.
+
+**Automatic JSON extraction:**
+
+When a model emits extra content around the JSON payload, lite-llm automatically
+strips it and extracts the JSON. Handled patterns include:
+
+| Pattern | Example models |
+|---------|----------------|
+| `<think>...</think>` / `<reasoning>...</reasoning>` | DeepSeek R1, Qwen3, QwQ |
+| `[THINK]...[/THINK]` | Mistral (Magistral, Ministral-3, Devstral) |
+| Markdown code fences (` ```json ``` `, ` ``` ``` `) | various |
+| Control tokens or plain-text preamble before `{` / `[` | various |
+
+If no valid JSON can be found, the full response is emitted as a JSON string.
 
 ## `--format jsonl` — JSON Lines (batch only)
 

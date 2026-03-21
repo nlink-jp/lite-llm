@@ -147,6 +147,20 @@ response_format_strategy = "prompt"
 - スキーマ準拠はベストエフォート（複雑なスキーマでは完全に従わない場合がある）。
 - `--json-schema` は機能するが、スキーマ強制はモデルの指示追従能力に依存する。
 
+**JSON の自動抽出:**
+
+モデルが JSON ペイロードの前後に余分な内容を出力した場合、lite-llm は自動的に
+それを除去して JSON を抽出します。対応パターン:
+
+| パターン | 代表的なモデル |
+|---------|--------------|
+| `<think>...</think>` / `<reasoning>...</reasoning>` | DeepSeek R1, Qwen3, QwQ |
+| `[THINK]...[/THINK]` | Mistral（Magistral, Ministral-3, Devstral） |
+| Markdown コードフェンス（` ```json ``` `、` ``` ``` `） | 各種 |
+| コントロールトークンや `{` / `[` 前のプリアンブルテキスト | 各種 |
+
+有効な JSON が見つからない場合は、レスポンス全体を JSON 文字列として出力します。
+
 ## `--format jsonl` — JSON Lines（バッチ専用）
 
 `--format jsonl` は **`--batch` と同時に指定する必要があります**。`--batch` なしで

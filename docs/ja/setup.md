@@ -2,7 +2,7 @@
 
 ## 前提条件
 
-- Go 1.24 以上
+- Go 1.26 以上
 - `golangci-lint`（`make lint` および `make check` に必要）
 - `govulncheck`（`make check` に必要）
 

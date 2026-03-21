@@ -99,6 +99,11 @@ The `response_format_strategy` config key controls fallback behaviour:
 - `native`: always send `response_format`; fail if unsupported.
 - `prompt`: never send `response_format`; always use prompt injection.
 
+When a model emits content around the JSON payload (control tokens, `<think>` /
+`<reasoning>` tags, Mistral `[THINK]` tags, or markdown code fences), the output
+formatter automatically strips the preamble and extracts the JSON value. If no
+valid JSON is found, the response is emitted as a JSON-encoded string.
+
 ## Endpoint URL resolution
 
 The client appends the chat completions path to the configured endpoint:

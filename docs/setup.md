@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Go 1.24 or later
+- Go 1.26 or later
 - `golangci-lint` (for `make lint` and `make check`)
 - `govulncheck` (for `make check`)
 
