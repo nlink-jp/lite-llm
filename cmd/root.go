@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -67,6 +68,9 @@ Key features:
 	// Security
 	f.Bool("no-safe-input", false, "Disable automatic data isolation for stdin/file inputs")
 
+	// Output control
+	f.BoolP("quiet", "q", false, "Suppress warning and informational messages on stderr")
+
 	// Config
 	f.StringP("config", "c", "", "Config file path")
 
@@ -79,6 +83,18 @@ Key features:
 
 func run(cmd *cobra.Command, args []string) error {
 	f := cmd.Flags()
+
+	// --- Stderr routing ---
+	// Route warning output to cmd.ErrOrStderr() so that tests can capture it
+	// via cmd.SetErr() and --quiet can suppress it cleanly.
+	quiet, _ := f.GetBool("quiet")
+	if quiet {
+		config.Stderr = io.Discard
+		client.SetStderr(io.Discard)
+	} else {
+		config.Stderr = cmd.ErrOrStderr()
+		client.SetStderr(cmd.ErrOrStderr())
+	}
 
 	// --- Config ---
 	cfgFile, _ := f.GetString("config")

@@ -278,3 +278,7 @@ func isResponseFormatError(err error) bool {
 
 // stderr is the writer used for warning messages; can be overridden in tests.
 var stderr io.Writer = os.Stderr
+
+// SetStderr redirects client warning output to w.
+// Pass io.Discard to suppress all warnings (e.g. when --quiet is active).
+func SetStderr(w io.Writer) { stderr = w }

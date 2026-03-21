@@ -391,3 +391,54 @@ func TestCommand_FormatJSONLWithoutBatchErrors(t *testing.T) {
 		t.Errorf("error should mention batch, got: %v", err)
 	}
 }
+
+func TestCommand_QuietSuppressesWarnings(t *testing.T) {
+	// Server that rejects response_format (triggers the fallback warning).
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var req struct {
+			ResponseFormat *struct{ Type string `json:"type"` } `json:"response_format"`
+		}
+		_ = json.NewDecoder(r.Body).Decode(&req)
+
+		if req.ResponseFormat != nil {
+			// First call: reject to trigger fallback warning.
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = fmt.Fprint(w, `{"error":{"message":"response_format not supported"}}`)
+			return
+		}
+		type msg struct {
+			Role    string `json:"role"`
+			Content string `json:"content"`
+		}
+		type resp struct {
+			Choices []struct {
+				Message msg `json:"message"`
+			} `json:"choices"`
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(resp{
+			Choices: []struct {
+				Message msg `json:"message"`
+			}{{Message: msg{Role: "assistant", Content: `{"ok":true}`}}},
+		})
+	}))
+	defer srv.Close()
+
+	// Without --quiet: warning should appear on stderr.
+	_, stderrOut, err := runCmd(t, srv.URL, "--format", "json", "--prompt", "hello")
+	if err != nil {
+		t.Fatalf("Execute() error: %v", err)
+	}
+	if !strings.Contains(stderrOut, "Warning:") {
+		t.Errorf("expected warning on stderr without --quiet, got: %q", stderrOut)
+	}
+
+	// With --quiet: stderr should be empty.
+	_, stderrQuiet, err := runCmd(t, srv.URL, "--format", "json", "--quiet", "--prompt", "hello")
+	if err != nil {
+		t.Fatalf("Execute() error with --quiet: %v", err)
+	}
+	if stderrQuiet != "" {
+		t.Errorf("expected no stderr output with --quiet, got: %q", stderrQuiet)
+	}
+}
