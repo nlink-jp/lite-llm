@@ -142,19 +142,29 @@ All contributors (including Claude Code) must follow these rules.
 - Python: run `pip-audit` (or `uv run pip-audit`) as part of `make check`.
 - Address any findings before merging; if a finding is accepted as low-risk, document the rationale.
 
-## 22. Versioning and Changelog
+## 22. Versioning, Changelog, and Release Packaging
 
 - Follow [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`).
-- Maintain a `CHANGELOG.md` updated with every release.
-- Tag releases in Git (`v1.2.3`) before distributing artifacts.
+- Maintain a `CHANGELOG.md` updated with every release (format: [Keep a Changelog](https://keepachangelog.com/)).
+- Release checklist (in order):
+  1. All tests pass (`make check`).
+  2. Update `CHANGELOG.md` with the new version and date.
+  3. Commit and push to `main`.
+  4. Create an annotated Git tag (`git tag -a vX.Y.Z`) and push it.
+  5. Cross-compile release binaries (`make build-all VERSION=vX.Y.Z`).
+  6. Package binaries: `.tar.gz` for Linux/macOS, `.zip` for Windows.
+  7. Create a GitHub Release with English release notes and upload the packaged binaries as assets.
+  8. Update the GitHub repository **About** section: description (English) and topics.
 
 ---
 
 ## 23. Code Review
 
-- All Pull Requests must be reviewed and approved by at least one other contributor before being merged into `main`.
-- Reviews should focus on correctness, design, readability, test coverage, and adherence to project rules.
-- Address all feedback and resolve comments before merging. Do not merge PRs with unresolved discussions.
+- This is a single-contributor project (see Rule 17); direct commits to `main` are the normal workflow.
+  External contributors must submit a Pull Request for review before merging.
+- For significant changes (new features, architecture changes), perform a self-review checklist before
+  committing: correctness, design, readability, test coverage, and adherence to project rules.
+- If a PR workflow is used (e.g., for collaboration or isolated review), resolve all discussions before merging.
 
 ## 24. Configuration Management
 
