@@ -166,6 +166,8 @@ lite-llm -q --format json "give me json" | jq .
 
 ## Documentation
 
+[日本語版 README](README.ja.md)
+
 - [Setup Guide](docs/setup.md) / [日本語](docs/ja/setup.md)
 - [Prompting Guide](docs/guide/prompting.md) / [日本語](docs/ja/guide/prompting.md)
 - [Structured Output Guide](docs/guide/structured-output.md) / [日本語](docs/ja/guide/structured-output.md)
