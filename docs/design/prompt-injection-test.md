@@ -2,7 +2,7 @@
 
 This document records empirical measurements of how much the data isolation
 mechanism reduces the success rate of prompt injection attacks, tested across
-three models.
+four models.
 
 ## Test conditions
 
@@ -19,6 +19,7 @@ three models.
 |---|---|---|
 | `openai/gpt-oss-20b` | ~20B dense | Weak instruction-following |
 | `qwen/qwen3.5-9b` | 9B | Moderate instruction-following |
+| `qwen2.5-7b-instruct-mlx` | 7B MLX | Strong instruction-following |
 | `qwen/qwen3-30b-2507` | 30B MoE | Strong instruction-following |
 
 All models were run locally via LM Studio.
@@ -84,6 +85,15 @@ The data isolation mechanism reduced the breakthrough rate from **40% to 10%**.
 
 The guard eliminated the remaining 5% breakthrough rate.
 
+### `qwen2.5-7b-instruct-mlx`
+
+| Condition | Guarded | Breakthrough |
+|---|---|---|
+| No guard (`--no-safe-input`) | 20 / 20 (100%) | **0 / 20 (0%)** |
+| Guard enabled | 20 / 20 (100%) | **0 / 20 (0%)** |
+
+Zero breakthroughs under both conditions.
+
 ### `qwen/qwen3-30b-2507`
 
 | Condition | Guarded | Breakthrough |
@@ -95,11 +105,12 @@ Zero breakthroughs under both conditions.
 
 ### Cross-model summary
 
-| Model | No guard breakthrough | With guard breakthrough |
-|---|---|---|
-| `gpt-oss-20b` (~20B dense) | 40% | 10% |
-| `qwen3.5-9b` (9B) | 5% | **0%** |
-| `qwen3-30b-2507` (30B MoE) | 0% | **0%** |
+| Model | Size | No guard breakthrough | With guard breakthrough |
+|---|---|---|---|
+| `gpt-oss-20b` | ~20B dense | 40% | 10% |
+| `qwen3.5-9b` | 9B | 5% | **0%** |
+| `qwen2.5-7b-instruct-mlx` | 7B MLX | **0%** | **0%** |
+| `qwen3-30b-2507` | 30B MoE | **0%** | **0%** |
 
 ## Interpretation
 
@@ -117,7 +128,7 @@ boundary between data and instructions.
 
 ### Model capability is the dominant factor
 
-The results across three models reveal a clear pattern: instruction-following
+The results across four models reveal a clear pattern: instruction-following
 capability determines baseline protection, and the guard adds a meaningful margin
 on top.
 
@@ -125,11 +136,11 @@ on top.
   significantly (40% → 10%) but cannot fully compensate for the model's weakness.
 - `qwen3.5-9b` (9B) already blocks 95% without the guard. The guard closes the
   remaining gap to 0%.
-- `qwen3-30b-2507` (30B MoE) achieves 0% without any guard, purely from
-  instruction-following ability.
+- `qwen2.5-7b-instruct-mlx` (7B) and `qwen3-30b-2507` (30B MoE) achieve 0%
+  without any guard, purely from instruction-following ability.
 
-Notably, the 9B Qwen model outperforms the 20B gpt-oss model — model architecture
-and training quality matter more than raw parameter count.
+The Qwen 2.5 (7B) and Qwen 3 (9B) models both outperform the ~20B gpt-oss model.
+**Model architecture and training quality matter more than raw parameter count.**
 
 ### Task-framing matters independently
 
@@ -142,8 +153,8 @@ models.
 
 - Data isolation provides a meaningful additional layer on top of task-framing,
   especially for weaker models.
-- Model architecture and training quality matter more than parameter count:
-  `qwen3.5-9b` (9B) significantly outperforms `gpt-oss-20b` (~20B).
+- Model architecture and training quality matter more than parameter count: 7B and
+  9B Qwen models significantly outperform a ~20B gpt-oss model.
 - For production use with untrusted data, choose a capable model and combine data
   isolation with a task-framing system prompt.
 - `--no-safe-input` should only be used when the input source is fully trusted.
