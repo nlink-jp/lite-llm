@@ -29,7 +29,7 @@ const placeholder = "{{DATA_TAG}}"
 //   - A per-invocation nonce tag name is generated (e.g. "user_data_a3f8b2").
 //   - The user input is wrapped in <user_data_NONCE>…</user_data_NONCE>.
 //   - Any occurrence of {{DATA_TAG}} in systemPrompt is replaced with the tag name.
-//   - An isolation note is appended to systemPrompt.
+//   - A CRITICAL isolation note is prepended before systemPrompt.
 //
 // When safe is false or inputIsExternal is false the inputs are returned unchanged.
 // The {{DATA_TAG}} placeholder is NOT expanded when safe is false, so it remains

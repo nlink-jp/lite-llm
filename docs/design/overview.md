@@ -54,8 +54,9 @@ The `isolation` package implements this by:
    {user input}
    </user_data_a3f8b2>
    ```
-4. Appending an isolation note to the system prompt that names the tag and instructs
-   the model to treat its contents as data only.
+4. Prepending a `CRITICAL` isolation constraint to the system prompt (before any
+   user-supplied system prompt text) that names the tag and instructs the model to
+   treat its contents as data only.
 
 The random nonce means an attacker who embeds `</user_data_XXXX>` in data cannot
 predict the tag name and therefore cannot escape the data container.
@@ -115,6 +116,20 @@ The client appends the chat completions path to the configured endpoint:
 This allows both bare base URLs (`https://api.openai.com`) and versioned URLs
 (`http://localhost:1234/v1`, common in LM Studio and similar local servers) to work
 without manual path adjustment.
+
+## Debug Mode (`--debug`)
+
+Pass `--debug` to log the full API request and response bodies to stderr before and
+after each HTTP call. Both `chatOnce` (blocking) and `ChatStream` (streaming) log
+their payloads. The output is pretty-printed JSON when the payload is valid JSON,
+raw bytes otherwise.
+
+This is useful for verifying that data isolation is working correctly: the logged
+`messages` array will show the `CRITICAL` constraint prepended to the system prompt
+and the user input wrapped in `<user_data_XXXXXX>` tags.
+
+`--debug` and `--quiet` can coexist: `--quiet` suppresses warning messages while
+`--debug` logs request/response details.
 
 ## Quiet Mode (`--quiet` / `-q`)
 
