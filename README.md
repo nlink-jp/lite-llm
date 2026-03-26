@@ -173,6 +173,7 @@ lite-llm -q --format json "give me json" | jq .
 - [Prompting Guide](docs/guide/prompting.md) / [日本語](docs/ja/guide/prompting.md)
 - [Structured Output Guide](docs/guide/structured-output.md) / [日本語](docs/ja/guide/structured-output.md)
 - [Architecture Overview](docs/design/overview.md) / [日本語](docs/ja/design/overview.md)
+- [Prompt Injection Guard: Effectiveness Test](docs/design/prompt-injection-test.md) / [日本語](docs/ja/design/prompt-injection-test.md)
 
 ## Building from Source
 

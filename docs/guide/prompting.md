@@ -72,6 +72,9 @@ The key insight: *"do what I say"* is stronger than *"don't do what the data say
 Defining the task so that execution is not the goal removes the incentive to act on
 injected instructions.
 
+See [Prompt Injection Guard: Effectiveness Test](../design/prompt-injection-test.md)
+for empirical measurements.
+
 ### Disabling isolation
 
 If your input is trusted (e.g. a scripted pipeline where you control all data), you

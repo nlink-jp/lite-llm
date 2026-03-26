@@ -169,6 +169,7 @@ lite-llm -q --format json "JSON を返してください" | jq .
 - [プロンプトガイド](docs/ja/guide/prompting.md)
 - [構造化出力ガイド](docs/ja/guide/structured-output.md)
 - [アーキテクチャ概要](docs/ja/design/overview.md)
+- [プロンプトインジェクションガード 効果測定レポート](docs/ja/design/prompt-injection-test.md)
 
 ## ソースからビルド
 
