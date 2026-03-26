@@ -39,3 +39,4 @@ The following features use stdlib only:
 - SSE stream parsing: `bufio.Scanner`
 - Cryptographic nonce: `crypto/rand`
 - UTF-8 validation: `unicode/utf8`, `strings.ToValidUTF8`
+- JSON extraction from LLM preamble: `regexp` (think-tag removal, code-fence extraction)
