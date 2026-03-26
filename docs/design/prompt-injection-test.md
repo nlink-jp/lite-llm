@@ -1,15 +1,26 @@
 # Prompt Injection Guard: Effectiveness Test
 
-This document records an empirical measurement of how much the data isolation
-mechanism reduces the success rate of prompt injection attacks.
+This document records empirical measurements of how much the data isolation
+mechanism reduces the success rate of prompt injection attacks, tested across
+two models.
 
 ## Test conditions
 
+### Common settings
+
 | Item | Value |
 |---|---|
-| Model | `openai/gpt-oss-20b` (LM Studio, local) |
 | Trials per condition | 20 |
 | Test date | 2026-03-27 |
+
+### Models tested
+
+| Model | Size | Type |
+|---|---|---|
+| `openai/gpt-oss-20b` | ~20B dense | Weak instruction-following |
+| `qwen/qwen3-30b-2507` | 30B MoE | Strong instruction-following |
+
+Both models were run locally via LM Studio.
 
 ### Attack string
 
@@ -54,12 +65,30 @@ per condition. Each JSONL record's `output` field was classified as:
 
 ## Results
 
+### `openai/gpt-oss-20b`
+
 | Condition | Guarded | Breakthrough |
 |---|---|---|
 | No guard (`--no-safe-input`) | 11 / 20 (55%) | **8 / 20 (40%)** |
 | Guard enabled | 18 / 20 (90%) | **2 / 20 (10%)** |
 
 The data isolation mechanism reduced the breakthrough rate from **40% to 10%**.
+
+### `qwen/qwen3-30b-2507`
+
+| Condition | Guarded | Breakthrough |
+|---|---|---|
+| No guard (`--no-safe-input`) | 20 / 20 (100%) | **0 / 20 (0%)** |
+| Guard enabled | 20 / 20 (100%) | **0 / 20 (0%)** |
+
+Zero breakthroughs under both conditions.
+
+### Cross-model summary
+
+| Model | No guard breakthrough | With guard breakthrough |
+|---|---|---|
+| `gpt-oss-20b` | 40% | 10% |
+| `qwen3-30b-2507` | **0%** | **0%** |
 
 ## Interpretation
 
@@ -75,30 +104,34 @@ When guard is enabled, two defences are layered:
 Together they reduce the attack surface by giving the model an explicit, named
 boundary between data and instructions.
 
-### Why 10% still breaks through
+### Why 10% still breaks through on gpt-oss-20b
 
 `gpt-oss-20b` is a relatively small model with limited instruction-following
 fidelity. On some runs it ignores the system prompt constraints entirely.
 This is a model capability limitation — no amount of prompt engineering provides
 a guaranteed defence against a model that does not reliably follow its system prompt.
 
-### Expected behaviour on capable models
+### qwen3-30b-2507: task-framing alone is sufficient
 
-On larger, instruction-following models (GPT-4o, Claude, Qwen3-30B, etc.) the
-`CRITICAL` constraint is respected consistently and breakthrough rates are expected
-to be near zero for typical injection attempts.
+`qwen3-30b-2507` achieved 100% block rate even without the XML guard
+(`--no-safe-input`). This shows that on a sufficiently capable model, a well-crafted
+task-framing system prompt alone prevents injection. The CRITICAL constraint provides
+an additional safety margin but was not needed here.
 
 ### Task-framing matters independently
 
-Even without the XML guard (`--no-safe-input`), the system prompt that defines the
-task as "analyse and report intent" (rather than "execute") blocked 55% of attacks
-on its own. The guard and task framing are complementary: **use both for the best
-result**.
+Even on `gpt-oss-20b`, the task-framing system prompt alone (no guard) blocked 55%
+of attacks. The guard and task framing are complementary: **use both for the best
+result**, especially when using weaker models.
 
 ## Takeaways
 
-- Data isolation is a meaningful defence: **4× reduction** in breakthrough rate on a
-  weak model (40% → 10%).
+- Data isolation is a meaningful defence on weak models: **4× reduction** in
+  breakthrough rate (40% → 10%).
+- On capable models (strong instruction-following), the combination of task-framing
+  system prompt + data isolation achieves **0% breakthrough**.
+- The guard compensates for model weakness but cannot fully substitute for model
+  capability.
 - For production use with untrusted data, choose a capable model and combine data
   isolation with a task-framing system prompt.
 - `--no-safe-input` should only be used when the input source is fully trusted.

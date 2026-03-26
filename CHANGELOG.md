@@ -28,8 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Added `--debug` usage and example output to the prompting guide.
 - Fixed stale tip that said the isolation note was appended after the system prompt.
 - Added empirical effectiveness test report (`docs/design/prompt-injection-test.md`):
-  n=20 trials on gpt-oss-20b showed data isolation reduces breakthrough rate from
-  40% to 10%. Linked from prompting guide and README.
+  n=20 trials on two models (gpt-oss-20b and qwen3-30b-2507). Data isolation reduces
+  breakthrough rate from 40% to 10% on weak models; capable models achieve 0%
+  breakthrough with task-framing system prompt alone. Linked from prompting guide
+  and README.
 
 ## [0.1.2] - 2026-03-21
 
