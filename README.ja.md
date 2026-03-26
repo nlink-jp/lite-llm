@@ -92,6 +92,7 @@ lite-llm [flags] [prompt]
 セキュリティ:
       --no-safe-input              データアイソレーションを無効化
   -q, --quiet                      stderr へのワーニングを抑制
+      --debug                      API リクエスト・レスポンスの内容を stderr に出力
 
 設定:
   -c, --config string              設定ファイルパス

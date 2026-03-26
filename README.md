@@ -92,6 +92,7 @@ Output format:
 Security:
       --no-safe-input              Disable automatic data isolation
   -q, --quiet                      Suppress warnings on stderr
+      --debug                      Log API request and response bodies to stderr
 
 Config:
   -c, --config string              Config file path

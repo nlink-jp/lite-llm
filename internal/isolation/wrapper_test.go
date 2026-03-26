@@ -44,7 +44,7 @@ func TestWrapInput_WrapsUserInput(t *testing.T) {
 
 func TestWrapInput_AddsIsolationNote(t *testing.T) {
 	_, sys := WrapInput("data", "", true, true)
-	if !strings.Contains(sys, "external data") {
+	if !strings.Contains(sys, "CRITICAL") {
 		t.Errorf("system prompt should contain isolation note, got: %q", sys)
 	}
 	if !strings.Contains(sys, "user_data_") {
@@ -57,8 +57,14 @@ func TestWrapInput_PreservesExistingSystemPrompt(t *testing.T) {
 	if !strings.Contains(sys, "analyze carefully") {
 		t.Errorf("original system prompt should be preserved, got: %q", sys)
 	}
-	if !strings.Contains(sys, "external data") {
-		t.Errorf("isolation note should be appended, got: %q", sys)
+	if !strings.Contains(sys, "CRITICAL") {
+		t.Errorf("isolation note should be present, got: %q", sys)
+	}
+	// Isolation note must come before the user's system prompt.
+	criticalIdx := strings.Index(sys, "CRITICAL")
+	taskIdx := strings.Index(sys, "analyze carefully")
+	if criticalIdx > taskIdx {
+		t.Errorf("isolation note should precede user system prompt: CRITICAL at %d, task at %d", criticalIdx, taskIdx)
 	}
 }
 

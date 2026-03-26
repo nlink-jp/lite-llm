@@ -70,6 +70,7 @@ Key features:
 
 	// Output control
 	f.BoolP("quiet", "q", false, "Suppress warning and informational messages on stderr")
+	f.Bool("debug", false, "Log API request and response bodies to stderr")
 
 	// Config
 	f.StringP("config", "c", "", "Config file path")
@@ -94,6 +95,13 @@ func run(cmd *cobra.Command, args []string) error {
 	} else {
 		config.Stderr = cmd.ErrOrStderr()
 		client.SetStderr(cmd.ErrOrStderr())
+	}
+
+	debug, _ := f.GetBool("debug")
+	if debug {
+		client.SetDebug(cmd.ErrOrStderr())
+	} else {
+		client.SetDebug(nil)
 	}
 
 	// --- Config ---

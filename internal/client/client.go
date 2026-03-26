@@ -76,6 +76,7 @@ func (c *Client) ChatStream(ctx context.Context, opts ChatOptions, responseChan 
 	if err != nil {
 		return fmt.Errorf("error marshalling request: %w", err)
 	}
+	debugLog("Request (stream):", jsonBody)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.endpoint(), bytes.NewBuffer(jsonBody))
 	if err != nil {
@@ -94,6 +95,9 @@ func (c *Client) ChatStream(ctx context.Context, opts ChatOptions, responseChan 
 		return fmt.Errorf("API error (status %d): %s", resp.StatusCode, string(body))
 	}
 
+	if debugWriter != nil {
+		_, _ = fmt.Fprintf(debugWriter, "[DEBUG] Response (stream): <SSE stream — tokens follow>\n")
+	}
 	return readStream(ctx, resp.Body, responseChan)
 }
 
@@ -113,6 +117,7 @@ func (c *Client) chatOnce(ctx context.Context, opts ChatOptions, sendFormat bool
 	if err != nil {
 		return "", fmt.Errorf("error marshalling request: %w", err)
 	}
+	debugLog("Request:", jsonBody)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.endpoint(), bytes.NewBuffer(jsonBody))
 	if err != nil {
@@ -130,6 +135,7 @@ func (c *Client) chatOnce(ctx context.Context, opts ChatOptions, sendFormat bool
 	if err != nil {
 		return "", fmt.Errorf("error reading response body: %w", err)
 	}
+	debugLog("Response:", body)
 
 	if resp.StatusCode != http.StatusOK {
 		return "", &apiResponseError{status: resp.StatusCode, body: string(body)}
@@ -282,3 +288,22 @@ var stderr io.Writer = os.Stderr
 // SetStderr redirects client warning output to w.
 // Pass io.Discard to suppress all warnings (e.g. when --quiet is active).
 func SetStderr(w io.Writer) { stderr = w }
+
+// debugWriter is the writer used for debug output; nil disables debug logging.
+var debugWriter io.Writer
+
+// SetDebug enables debug logging to w. Pass nil to disable.
+func SetDebug(w io.Writer) { debugWriter = w }
+
+func debugLog(label string, data []byte) {
+	if debugWriter == nil {
+		return
+	}
+	var buf bytes.Buffer
+	if err := json.Indent(&buf, data, "", "  "); err != nil {
+		// Not valid JSON — print as-is.
+		_, _ = fmt.Fprintf(debugWriter, "[DEBUG] %s\n%s\n", label, string(data))
+		return
+	}
+	_, _ = fmt.Fprintf(debugWriter, "[DEBUG] %s\n%s\n", label, buf.String())
+}
