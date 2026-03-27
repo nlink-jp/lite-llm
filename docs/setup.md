@@ -46,8 +46,11 @@ This copies `scripts/hooks/pre-commit` and `scripts/hooks/pre-push` into `.git/h
 2. Edit `~/.config/lite-llm/config.toml` and set at minimum:
 
    ```toml
-   model = "gpt-4o-mini"
+   [api]
    api_key = "sk-..."
+
+   [model]
+   name = "gpt-4o-mini"
    ```
 
 3. **Secure the config file permissions** (required if the file contains an API key):

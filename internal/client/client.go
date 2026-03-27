@@ -31,7 +31,7 @@ func New(cfg *config.Config) *Client {
 	return &Client{
 		cfg: cfg,
 		httpClient: &http.Client{
-			Timeout: time.Duration(cfg.TimeoutSeconds) * time.Second,
+			Timeout: time.Duration(cfg.API.TimeoutSeconds) * time.Second,
 		},
 	}
 }
@@ -44,10 +44,10 @@ type ChatOptions struct {
 }
 
 // Chat sends a single request and returns the full response text.
-// When cfg.ResponseFormatStrategy is "auto" and the API rejects response_format,
+// When cfg.API.ResponseFormatStrategy is "auto" and the API rejects response_format,
 // it retries with a prompt-injection fallback and logs a warning to stderr.
 func (c *Client) Chat(ctx context.Context, opts ChatOptions) (string, error) {
-	switch c.cfg.ResponseFormatStrategy {
+	switch c.cfg.API.ResponseFormatStrategy {
 	case "native":
 		return c.chatOnce(ctx, opts, true)
 	case "prompt":
@@ -67,7 +67,7 @@ func (c *Client) Chat(ctx context.Context, opts ChatOptions) (string, error) {
 func (c *Client) ChatStream(ctx context.Context, opts ChatOptions, responseChan chan<- string) error {
 	msgs := buildMessages(opts.SystemPrompt, opts.UserPrompt)
 	reqBody := chatRequest{
-		Model:    c.cfg.Model,
+		Model:    c.cfg.Model.Name,
 		Messages: msgs,
 		Stream:   true,
 	}
@@ -106,7 +106,7 @@ func (c *Client) ChatStream(ctx context.Context, opts ChatOptions, responseChan 
 func (c *Client) chatOnce(ctx context.Context, opts ChatOptions, sendFormat bool) (string, error) {
 	msgs := buildMessages(opts.SystemPrompt, opts.UserPrompt)
 	reqBody := chatRequest{
-		Model:    c.cfg.Model,
+		Model:    c.cfg.Model.Name,
 		Messages: msgs,
 	}
 	if sendFormat && opts.ResponseFormat != nil {
@@ -152,7 +152,7 @@ func (c *Client) chatOnce(ctx context.Context, opts ChatOptions, sendFormat bool
 }
 
 func (c *Client) endpoint() string {
-	base := strings.TrimRight(c.cfg.Endpoint, "/")
+	base := strings.TrimRight(c.cfg.API.BaseURL, "/")
 	// If the base URL already ends with /v1, append only /chat/completions.
 	if strings.HasSuffix(base, "/v1") {
 		return base + "/chat/completions"
@@ -162,8 +162,8 @@ func (c *Client) endpoint() string {
 
 func (c *Client) setHeaders(req *http.Request) {
 	req.Header.Set("Content-Type", "application/json")
-	if c.cfg.APIKey != "" {
-		req.Header.Set("Authorization", "Bearer "+c.cfg.APIKey)
+	if c.cfg.API.APIKey != "" {
+		req.Header.Set("Authorization", "Bearer "+c.cfg.API.APIKey)
 	}
 }
 

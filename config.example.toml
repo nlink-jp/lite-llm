@@ -1,26 +1,20 @@
-# lite-llm configuration file
-# Copy to ~/.config/lite-llm/config.toml and fill in your values.
-#
-# Environment variables override file values:
-#   LITE_LLM_API_KEY   — API key
-#   LITE_LLM_ENDPOINT  — API base URL
-#   LITE_LLM_MODEL     — default model
+# lite-llm example configuration
+# Copy this file to ~/.config/lite-llm/config.toml and fill in your values.
+# All settings can also be overridden via environment variables (prefix: LITE_LLM_).
 
-# API base URL.
-# Default: https://api.openai.com
+[api]
+# Base URL of the OpenAI-compatible API endpoint.
+# Environment variable: LITE_LLM_BASE_URL
 # For LM Studio: http://localhost:1234
 # For Ollama:    http://localhost:11434
-#endpoint = "https://api.openai.com"
+#base_url = "https://api.openai.com"
 
-# Default model name.
-# This value is also the compiled-in default when no config file is present.
-model = "gpt-4o-mini"
-
-# API key.
+# API key sent in the Authorization header.
 # For local APIs that do not require authentication, leave commented out.
+# Environment variable: LITE_LLM_API_KEY
 #api_key = "sk-..."
 
-# HTTP request timeout in seconds. Default: 120
+# HTTP request timeout in seconds.
 #timeout_seconds = 120
 
 # Structured output strategy when --format json or --json-schema is used.
@@ -28,3 +22,8 @@ model = "gpt-4o-mini"
 #   native — always send response_format; fail if the API does not support it
 #   prompt — never send response_format; always use system-prompt injection
 #response_format_strategy = "auto"
+
+[model]
+# Default model name.
+# Environment variable: LITE_LLM_MODEL
+name = "gpt-4o-mini"

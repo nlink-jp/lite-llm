@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] - 2026-03-27
+
+### Changed
+
+- **Breaking: config file format** — the config file now uses TOML sections instead
+  of flat top-level keys, aligning with the lite-series convention.
+
+  Before:
+  ```toml
+  endpoint = "https://api.openai.com"
+  model    = "gpt-4o-mini"
+  api_key  = "sk-..."
+  ```
+
+  After:
+  ```toml
+  [api]
+  base_url = "https://api.openai.com"
+  api_key  = "sk-..."
+
+  [model]
+  name = "gpt-4o-mini"
+  ```
+
+- **Breaking: `endpoint` renamed to `base_url`** (under `[api]`) — consistent with
+  lite-rag. The field accepts the same values as before; `/v1` suffix is handled
+  automatically.
+- **Breaking: environment variable `LITE_LLM_ENDPOINT` renamed to `LITE_LLM_BASE_URL`**.
+
+  Migration: update `~/.config/lite-llm/config.toml` to the new format, or use
+  `cp config.example.toml ~/.config/lite-llm/config.toml` as a starting point.
+
 ## [0.1.3] - 2026-03-27
 
 ### Added

@@ -46,8 +46,11 @@ make setup
 2. `~/.config/lite-llm/config.toml` を編集して最低限以下を設定:
 
    ```toml
-   model = "gpt-4o-mini"
+   [api]
    api_key = "sk-..."
+
+   [model]
+   name = "gpt-4o-mini"
    ```
 
 3. **設定ファイルのパーミッションを保護する**（API キーを含む場合は必須）:

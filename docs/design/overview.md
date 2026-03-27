@@ -37,7 +37,7 @@ lite-llm/
 Values are resolved in priority order (highest first):
 
 1. CLI flags (`--model`, `--endpoint`)
-2. Environment variables (`LITE_LLM_API_KEY`, `LITE_LLM_ENDPOINT`, `LITE_LLM_MODEL`)
+2. Environment variables (`LITE_LLM_API_KEY`, `LITE_LLM_BASE_URL`, `LITE_LLM_MODEL`)
 3. Config file (`~/.config/lite-llm/config.toml`)
 4. Compiled-in defaults
 

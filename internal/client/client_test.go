@@ -16,10 +16,12 @@ import (
 // newTestClient creates a Client pointing at the given test server URL.
 func newTestClient(serverURL string) *Client {
 	cfg := &config.Config{
-		Endpoint:               serverURL,
-		Model:                  "test-model",
-		TimeoutSeconds:         5,
-		ResponseFormatStrategy: "native",
+		API: config.APIConfig{
+			BaseURL:                serverURL,
+			TimeoutSeconds:         5,
+			ResponseFormatStrategy: "native",
+		},
+		Model: config.ModelConfig{Name: "test-model"},
 	}
 	return New(cfg)
 }
@@ -209,10 +211,12 @@ func TestChat_AutoFallback(t *testing.T) {
 	defer srv.Close()
 
 	cfg := &config.Config{
-		Endpoint:               srv.URL,
-		Model:                  "test-model",
-		TimeoutSeconds:         5,
-		ResponseFormatStrategy: "auto",
+		API: config.APIConfig{
+			BaseURL:                srv.URL,
+			TimeoutSeconds:         5,
+			ResponseFormatStrategy: "auto",
+		},
+		Model: config.ModelConfig{Name: "test-model"},
 	}
 	c := New(cfg)
 
@@ -254,10 +258,12 @@ func TestChat_PromptStrategy_NeverSendsResponseFormat(t *testing.T) {
 	defer srv.Close()
 
 	cfg := &config.Config{
-		Endpoint:               srv.URL,
-		Model:                  "test-model",
-		TimeoutSeconds:         5,
-		ResponseFormatStrategy: "prompt",
+		API: config.APIConfig{
+			BaseURL:                srv.URL,
+			TimeoutSeconds:         5,
+			ResponseFormatStrategy: "prompt",
+		},
+		Model: config.ModelConfig{Name: "test-model"},
 	}
 	c := New(cfg)
 	_, err := c.Chat(context.Background(), ChatOptions{
@@ -317,7 +323,7 @@ func TestEndpoint_WithV1Suffix(t *testing.T) {
 	}
 	for _, tt := range tests {
 		c := newTestClient(tt.endpoint)
-		c.cfg.Endpoint = tt.endpoint
+		c.cfg.API.BaseURL = tt.endpoint
 		got := c.endpoint()
 		if got != tt.want {
 			t.Errorf("endpoint(%q) = %q, want %q", tt.endpoint, got, tt.want)

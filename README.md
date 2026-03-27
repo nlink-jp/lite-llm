@@ -53,9 +53,12 @@ chmod 600 ~/.config/lite-llm/config.toml
 
 ```toml
 # ~/.config/lite-llm/config.toml
-endpoint = "https://api.openai.com"
-model    = "gpt-4o-mini"
+[api]
+base_url = "https://api.openai.com"
 api_key  = "sk-..."
+
+[model]
+name = "gpt-4o-mini"
 ```
 
 **Priority order (highest first):** CLI flags → environment variables → config file → compiled-in defaults
@@ -63,7 +66,7 @@ api_key  = "sk-..."
 | Environment variable  | Description        |
 |-----------------------|--------------------|
 | `LITE_LLM_API_KEY`   | API key            |
-| `LITE_LLM_ENDPOINT`  | API base URL       |
+| `LITE_LLM_BASE_URL`  | API base URL       |
 | `LITE_LLM_MODEL`     | Default model name |
 
 ## Usage

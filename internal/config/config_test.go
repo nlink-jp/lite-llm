@@ -13,20 +13,20 @@ func TestDefaults(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Load() unexpected error: %v", err)
 	}
-	if cfg.Endpoint != defaultEndpoint {
-		t.Errorf("Endpoint = %q, want %q", cfg.Endpoint, defaultEndpoint)
+	if cfg.API.BaseURL != defaultBaseURL {
+		t.Errorf("API.BaseURL = %q, want %q", cfg.API.BaseURL, defaultBaseURL)
 	}
-	if cfg.Model != defaultModel {
-		t.Errorf("Model = %q, want %q", cfg.Model, defaultModel)
+	if cfg.Model.Name != defaultModel {
+		t.Errorf("Model.Name = %q, want %q", cfg.Model.Name, defaultModel)
 	}
-	if cfg.TimeoutSeconds != defaultTimeoutSeconds {
-		t.Errorf("TimeoutSeconds = %d, want %d", cfg.TimeoutSeconds, defaultTimeoutSeconds)
+	if cfg.API.TimeoutSeconds != defaultTimeoutSeconds {
+		t.Errorf("API.TimeoutSeconds = %d, want %d", cfg.API.TimeoutSeconds, defaultTimeoutSeconds)
 	}
-	if cfg.ResponseFormatStrategy != defaultResponseFormatStrategy {
-		t.Errorf("ResponseFormatStrategy = %q, want %q", cfg.ResponseFormatStrategy, defaultResponseFormatStrategy)
+	if cfg.API.ResponseFormatStrategy != defaultResponseFormatStrategy {
+		t.Errorf("API.ResponseFormatStrategy = %q, want %q", cfg.API.ResponseFormatStrategy, defaultResponseFormatStrategy)
 	}
-	if cfg.APIKey != "" {
-		t.Errorf("APIKey = %q, want empty string", cfg.APIKey)
+	if cfg.API.APIKey != "" {
+		t.Errorf("API.APIKey = %q, want empty string", cfg.API.APIKey)
 	}
 }
 
@@ -34,11 +34,14 @@ func TestLoadFromFile(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "config.toml")
 	content := `
-endpoint = "http://localhost:1234"
-model = "llama3"
-api_key = "test-key"
+[api]
+base_url = "http://localhost:1234"
+api_key  = "test-key"
 timeout_seconds = 30
 response_format_strategy = "native"
+
+[model]
+name = "llama3"
 `
 	if err := os.WriteFile(path, []byte(content), 0600); err != nil {
 		t.Fatalf("WriteFile: %v", err)
@@ -48,40 +51,40 @@ response_format_strategy = "native"
 	if err != nil {
 		t.Fatalf("Load() unexpected error: %v", err)
 	}
-	if cfg.Endpoint != "http://localhost:1234" {
-		t.Errorf("Endpoint = %q, want %q", cfg.Endpoint, "http://localhost:1234")
+	if cfg.API.BaseURL != "http://localhost:1234" {
+		t.Errorf("API.BaseURL = %q, want %q", cfg.API.BaseURL, "http://localhost:1234")
 	}
-	if cfg.Model != "llama3" {
-		t.Errorf("Model = %q, want %q", cfg.Model, "llama3")
+	if cfg.Model.Name != "llama3" {
+		t.Errorf("Model.Name = %q, want %q", cfg.Model.Name, "llama3")
 	}
-	if cfg.APIKey != "test-key" {
-		t.Errorf("APIKey = %q, want %q", cfg.APIKey, "test-key")
+	if cfg.API.APIKey != "test-key" {
+		t.Errorf("API.APIKey = %q, want %q", cfg.API.APIKey, "test-key")
 	}
-	if cfg.TimeoutSeconds != 30 {
-		t.Errorf("TimeoutSeconds = %d, want 30", cfg.TimeoutSeconds)
+	if cfg.API.TimeoutSeconds != 30 {
+		t.Errorf("API.TimeoutSeconds = %d, want 30", cfg.API.TimeoutSeconds)
 	}
-	if cfg.ResponseFormatStrategy != "native" {
-		t.Errorf("ResponseFormatStrategy = %q, want %q", cfg.ResponseFormatStrategy, "native")
+	if cfg.API.ResponseFormatStrategy != "native" {
+		t.Errorf("API.ResponseFormatStrategy = %q, want %q", cfg.API.ResponseFormatStrategy, "native")
 	}
 }
 
 func TestEnvOverrides(t *testing.T) {
 	t.Setenv("LITE_LLM_API_KEY", "env-key")
-	t.Setenv("LITE_LLM_ENDPOINT", "http://env-endpoint")
+	t.Setenv("LITE_LLM_BASE_URL", "http://env-endpoint")
 	t.Setenv("LITE_LLM_MODEL", "env-model")
 
 	cfg, err := Load("/nonexistent/path/config.toml")
 	if err != nil {
 		t.Fatalf("Load() unexpected error: %v", err)
 	}
-	if cfg.APIKey != "env-key" {
-		t.Errorf("APIKey = %q, want %q", cfg.APIKey, "env-key")
+	if cfg.API.APIKey != "env-key" {
+		t.Errorf("API.APIKey = %q, want %q", cfg.API.APIKey, "env-key")
 	}
-	if cfg.Endpoint != "http://env-endpoint" {
-		t.Errorf("Endpoint = %q, want %q", cfg.Endpoint, "http://env-endpoint")
+	if cfg.API.BaseURL != "http://env-endpoint" {
+		t.Errorf("API.BaseURL = %q, want %q", cfg.API.BaseURL, "http://env-endpoint")
 	}
-	if cfg.Model != "env-model" {
-		t.Errorf("Model = %q, want %q", cfg.Model, "env-model")
+	if cfg.Model.Name != "env-model" {
+		t.Errorf("Model.Name = %q, want %q", cfg.Model.Name, "env-model")
 	}
 }
 
@@ -89,9 +92,12 @@ func TestEnvOverridesFileValues(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "config.toml")
 	content := `
-endpoint = "http://file-endpoint"
-model = "file-model"
-api_key = "file-key"
+[api]
+base_url = "http://file-endpoint"
+api_key  = "file-key"
+
+[model]
+name = "file-model"
 `
 	if err := os.WriteFile(path, []byte(content), 0600); err != nil {
 		t.Fatalf("WriteFile: %v", err)
@@ -104,12 +110,12 @@ api_key = "file-key"
 		t.Fatalf("Load() unexpected error: %v", err)
 	}
 	// env var should win over file value
-	if cfg.Model != "env-model" {
-		t.Errorf("Model = %q, want %q", cfg.Model, "env-model")
+	if cfg.Model.Name != "env-model" {
+		t.Errorf("Model.Name = %q, want %q", cfg.Model.Name, "env-model")
 	}
 	// file value should remain for non-overridden keys
-	if cfg.Endpoint != "http://file-endpoint" {
-		t.Errorf("Endpoint = %q, want %q", cfg.Endpoint, "http://file-endpoint")
+	if cfg.API.BaseURL != "http://file-endpoint" {
+		t.Errorf("API.BaseURL = %q, want %q", cfg.API.BaseURL, "http://file-endpoint")
 	}
 }
 
@@ -151,7 +157,7 @@ func TestResolvePath(t *testing.T) {
 func TestLoad_WarnsOnInsecurePermissions(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "config.toml")
-	if err := os.WriteFile(path, []byte(`model = "gpt-4o-mini"`), 0644); err != nil {
+	if err := os.WriteFile(path, []byte("[model]\nname = \"gpt-4o-mini\""), 0644); err != nil {
 		t.Fatalf("WriteFile: %v", err)
 	}
 
@@ -174,7 +180,7 @@ func TestLoad_WarnsOnInsecurePermissions(t *testing.T) {
 func TestLoad_NoWarnOnSecurePermissions(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "config.toml")
-	if err := os.WriteFile(path, []byte(`model = "gpt-4o-mini"`), 0600); err != nil {
+	if err := os.WriteFile(path, []byte("[model]\nname = \"gpt-4o-mini\""), 0600); err != nil {
 		t.Fatalf("WriteFile: %v", err)
 	}
 

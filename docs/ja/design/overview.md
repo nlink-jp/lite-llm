@@ -39,7 +39,7 @@ lite-llm/
 以下の優先順位（高い順）で値を解決します:
 
 1. CLI フラグ（`--model`, `--endpoint`）
-2. 環境変数（`LITE_LLM_API_KEY`, `LITE_LLM_ENDPOINT`, `LITE_LLM_MODEL`）
+2. 環境変数（`LITE_LLM_API_KEY`, `LITE_LLM_BASE_URL`, `LITE_LLM_MODEL`）
 3. 設定ファイル（`~/.config/lite-llm/config.toml`）
 4. コンパイル時デフォルト値
 

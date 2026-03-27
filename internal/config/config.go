@@ -15,7 +15,7 @@ import (
 var Stderr io.Writer = os.Stderr
 
 const (
-	defaultEndpoint               = "https://api.openai.com"
+	defaultBaseURL                = "https://api.openai.com"
 	defaultModel                  = "gpt-4o-mini"
 	defaultTimeoutSeconds         = 120
 	defaultResponseFormatStrategy = "auto"
@@ -24,11 +24,21 @@ const (
 // Config holds all application configuration.
 // Values are resolved in order: CLI flags > environment variables > config file > defaults.
 type Config struct {
-	Endpoint               string `toml:"endpoint"`
-	Model                  string `toml:"model"`
+	API   APIConfig   `toml:"api"`
+	Model ModelConfig `toml:"model"`
+}
+
+// APIConfig holds connection and request settings for the LLM API.
+type APIConfig struct {
+	BaseURL                string `toml:"base_url"`
 	APIKey                 string `toml:"api_key"`
 	TimeoutSeconds         int    `toml:"timeout_seconds"`
 	ResponseFormatStrategy string `toml:"response_format_strategy"`
+}
+
+// ModelConfig specifies which model to use.
+type ModelConfig struct {
+	Name string `toml:"name"`
 }
 
 // Load reads configuration from configPath (or the default path when empty),
@@ -58,22 +68,26 @@ func Load(configPath string) (*Config, error) {
 
 func defaults() *Config {
 	return &Config{
-		Endpoint:               defaultEndpoint,
-		Model:                  defaultModel,
-		TimeoutSeconds:         defaultTimeoutSeconds,
-		ResponseFormatStrategy: defaultResponseFormatStrategy,
+		API: APIConfig{
+			BaseURL:                defaultBaseURL,
+			TimeoutSeconds:         defaultTimeoutSeconds,
+			ResponseFormatStrategy: defaultResponseFormatStrategy,
+		},
+		Model: ModelConfig{
+			Name: defaultModel,
+		},
 	}
 }
 
 func applyEnvOverrides(cfg *Config) {
 	if v := os.Getenv("LITE_LLM_API_KEY"); v != "" {
-		cfg.APIKey = v
+		cfg.API.APIKey = v
 	}
-	if v := os.Getenv("LITE_LLM_ENDPOINT"); v != "" {
-		cfg.Endpoint = v
+	if v := os.Getenv("LITE_LLM_BASE_URL"); v != "" {
+		cfg.API.BaseURL = v
 	}
 	if v := os.Getenv("LITE_LLM_MODEL"); v != "" {
-		cfg.Model = v
+		cfg.Model.Name = v
 	}
 }
 

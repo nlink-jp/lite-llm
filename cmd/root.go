@@ -111,12 +111,12 @@ func run(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 	if m, _ := f.GetString("model"); m != "" {
-		cfg.Model = m
+		cfg.Model.Name = m
 	}
 	if e, _ := f.GetString("endpoint"); e != "" {
-		cfg.Endpoint = e
+		cfg.API.BaseURL = e
 	}
-	if cfg.Model == "" {
+	if cfg.Model.Name == "" {
 		return fmt.Errorf("no model specified: set model in config file, LITE_LLM_MODEL env var, or --model flag")
 	}
 

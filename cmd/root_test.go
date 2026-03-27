@@ -124,7 +124,9 @@ func runCmd(t *testing.T, serverURL string, args ...string) (stdout, stderr stri
 	cmd.SetErr(&errBuf)
 
 	// Prepend flags that point at the test server.
+	// Use a non-existent config path so tests are not affected by the user's real config file.
 	fullArgs := append([]string{
+		"--config", "/nonexistent/test-config.toml",
 		"--endpoint", serverURL,
 		"--model", "test-model",
 	}, args...)
@@ -213,7 +215,7 @@ func TestCommand_MissingModelError(t *testing.T) {
 	// Write a config that explicitly clears the model to trigger the validation error.
 	dir := t.TempDir()
 	cfgPath := filepath.Join(dir, "config.toml")
-	_ = os.WriteFile(cfgPath, []byte(`model = ""`), 0600)
+	_ = os.WriteFile(cfgPath, []byte("[model]\nname = \"\""), 0600)
 
 	var outBuf bytes.Buffer
 	cmd := newRootCmd()
