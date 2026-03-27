@@ -14,11 +14,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/magifd2/lite-llm/internal/client"
-	"github.com/magifd2/lite-llm/internal/config"
-	"github.com/magifd2/lite-llm/internal/input"
-	"github.com/magifd2/lite-llm/internal/isolation"
-	"github.com/magifd2/lite-llm/internal/output"
+	"github.com/nlink-jp/lite-llm/internal/client"
+	"github.com/nlink-jp/lite-llm/internal/config"
+	"github.com/nlink-jp/lite-llm/internal/input"
+	"github.com/nlink-jp/lite-llm/internal/isolation"
+	"github.com/nlink-jp/lite-llm/internal/output"
 )
 
 // version is set at build time via ldflags.

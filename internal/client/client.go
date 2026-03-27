@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/magifd2/lite-llm/internal/config"
+	"github.com/nlink-jp/lite-llm/internal/config"
 )
 
 const chatCompletionsPath = "/v1/chat/completions"

@@ -124,7 +124,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **Cross-compilation**: `make build-all` produces binaries for
   `linux/amd64`, `linux/arm64`, `darwin/amd64`, `darwin/arm64`, `windows/amd64`.
 
-[0.1.3]: https://github.com/magifd2/lite-llm/releases/tag/v0.1.3
-[0.1.2]: https://github.com/magifd2/lite-llm/releases/tag/v0.1.2
-[0.1.1]: https://github.com/magifd2/lite-llm/releases/tag/v0.1.1
-[0.1.0]: https://github.com/magifd2/lite-llm/releases/tag/v0.1.0
+[0.1.3]: https://github.com/nlink-jp/lite-llm/releases/tag/v0.1.3
+[0.1.2]: https://github.com/nlink-jp/lite-llm/releases/tag/v0.1.2
+[0.1.1]: https://github.com/nlink-jp/lite-llm/releases/tag/v0.1.1
+[0.1.0]: https://github.com/nlink-jp/lite-llm/releases/tag/v0.1.0

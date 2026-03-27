@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/magifd2/lite-llm/cmd"
+	"github.com/nlink-jp/lite-llm/cmd"
 )
 
 func main() {

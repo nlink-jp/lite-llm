@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/magifd2/lite-llm/internal/config"
+	"github.com/nlink-jp/lite-llm/internal/config"
 )
 
 // newTestClient creates a Client pointing at the given test server URL.

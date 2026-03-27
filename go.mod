@@ -1,4 +1,4 @@
-module github.com/magifd2/lite-llm
+module github.com/nlink-jp/lite-llm
 
 go 1.26
 
