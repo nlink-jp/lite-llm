@@ -28,11 +28,11 @@ type Client struct {
 
 // New creates a new Client using the provided configuration.
 func New(cfg *config.Config) *Client {
-	if strings.HasPrefix(cfg.Endpoint, "http://") && cfg.APIKey != "" {
+	if strings.HasPrefix(cfg.API.BaseURL, "http://") && cfg.API.APIKey != "" {
 		_, _ = fmt.Fprintf(stderr,
 			"Warning: sending API key over unencrypted HTTP to %s.\n"+
 				"  Use an https:// endpoint to protect your credentials.\n",
-			cfg.Endpoint,
+			cfg.API.BaseURL,
 		)
 	}
 	return &Client{
