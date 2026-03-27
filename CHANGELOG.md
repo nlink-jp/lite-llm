@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.2.1] - 2026-03-27
+
+### Security
+
+- Added warning when an API key is sent over an unencrypted `http://` endpoint.
+  The advisory is printed to stderr; the request is not blocked to preserve
+  compatibility with intentional local-only HTTP setups (e.g. LM Studio on localhost).
+
+
 ## [0.2.0] - 2026-03-27
 
 ### Changed
@@ -124,6 +133,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **Cross-compilation**: `make build-all` produces binaries for
   `linux/amd64`, `linux/arm64`, `darwin/amd64`, `darwin/arm64`, `windows/amd64`.
 
+[0.2.1]: https://github.com/nlink-jp/lite-llm/releases/tag/v0.2.1
+[0.2.0]: https://github.com/nlink-jp/lite-llm/releases/tag/v0.2.0
 [0.1.3]: https://github.com/nlink-jp/lite-llm/releases/tag/v0.1.3
 [0.1.2]: https://github.com/nlink-jp/lite-llm/releases/tag/v0.1.2
 [0.1.1]: https://github.com/nlink-jp/lite-llm/releases/tag/v0.1.1
