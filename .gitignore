@@ -1,7 +1,4 @@
-# Compiled binaries
-bin/
-
-# Release archives
+# Build artifacts
 dist/
 
 # Project-local Go module cache (sandbox workaround)

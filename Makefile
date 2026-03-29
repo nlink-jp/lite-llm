@@ -4,7 +4,6 @@ VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev
 LDFLAGS := -ldflags "-X main.version=$(VERSION)"
 
 # Build output directories
-BIN_DIR  := bin
 DIST_DIR := dist
 
 # Cross-compilation targets
@@ -22,8 +21,8 @@ all: build
 
 ## build: compile the binary for the current platform
 build:
-	@mkdir -p $(BIN_DIR)
-	go build $(LDFLAGS) -o $(BIN_DIR)/$(BINARY) .
+	@mkdir -p $(DIST_DIR)
+	go build $(LDFLAGS) -o $(DIST_DIR)/$(BINARY) .
 
 ## test: run all unit tests
 test:
@@ -65,4 +64,4 @@ build-all:
 
 ## clean: remove build artifacts
 clean:
-	@rm -rf $(BIN_DIR) $(DIST_DIR)
+	@rm -rf $(DIST_DIR)
