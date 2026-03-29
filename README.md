@@ -16,7 +16,7 @@ A lightweight CLI for OpenAI-compatible LLM APIs, designed for scripting and dat
 git clone https://github.com/nlink-jp/lite-llm.git
 cd lite-llm
 make build
-# binary: bin/lite-llm
+# binary: dist/lite-llm
 ```
 
 Or download a pre-built binary from the [releases page](https://github.com/nlink-jp/lite-llm/releases).
@@ -183,7 +183,7 @@ lite-llm -q --format json "give me json" | jq .
 Requires Go 1.26+.
 
 ```sh
-make build          # current platform → bin/lite-llm
+make build          # current platform → dist/lite-llm
 make build-all      # all 5 platforms  → dist/
 make check          # vet + lint + test + build + govulncheck
 make setup          # install git hooks

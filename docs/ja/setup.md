@@ -20,7 +20,7 @@ git clone <リポジトリURL>
 cd lite-llm
 go mod download
 make build
-# バイナリは bin/lite-llm に生成されます
+# バイナリは dist/lite-llm に生成されます
 ```
 
 ## git フックのインストール

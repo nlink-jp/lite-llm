@@ -20,7 +20,7 @@ git clone <repo-url>
 cd lite-llm
 go mod download
 make build
-# Binary is at bin/lite-llm
+# Binary is at dist/lite-llm
 ```
 
 ## Install git hooks
