@@ -1,7 +1,7 @@
 BINARY  := lite-llm
-MODULE  := github.com/magifd2/lite-llm
+MODULE  := github.com/nlink-jp/lite-llm
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
-LDFLAGS := -ldflags "-X main.version=$(VERSION)"
+LDFLAGS := -ldflags "-X github.com/nlink-jp/lite-llm/cmd.version=$(VERSION)"
 
 # Build output directories
 DIST_DIR := dist
