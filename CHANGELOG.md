@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
 
+## [0.2.4] - 2026-03-31
+
+### Fixed
+- Skip config file permission check on Windows/NTFS (always reports 0666)
+
 ## [0.2.3] - 2026-03-30
 
 ### Fixed
