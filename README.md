@@ -1,5 +1,7 @@
 # lite-llm
 
+> **Archived:** This project has been superseded by [llm-cli](https://github.com/nlink-jp/llm-cli), which provides all the same features plus multi-image VLM input, full [nlk](https://github.com/nlink-jp/nlk) library integration, and JSON schema structured output. Please use llm-cli for new projects.
+
 A lightweight CLI for OpenAI-compatible LLM APIs, designed for scripting and data-pipeline use cases.
 
 ## Features

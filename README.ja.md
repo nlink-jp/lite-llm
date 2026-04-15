@@ -1,5 +1,7 @@
 # lite-llm
 
+> **アーカイブ済み:** このプロジェクトは [llm-cli](https://github.com/nlink-jp/llm-cli) に引き継がれました。llm-cli は同等の全機能に加え、マルチイメージ VLM 入力、[nlk](https://github.com/nlink-jp/nlk) ライブラリの完全統合、JSON スキーマ構造化出力を提供します。新規利用には llm-cli をお使いください。
+
 OpenAI 互換 LLM API 向けの軽量 CLI です。スクリプティングやデータパイプラインでの利用を想定して設計されています。
 
 ## 主な機能
